@@ -34,15 +34,6 @@ jobs:
           pip3 install -r requirements_versions.txt
 
       # Step 5: Download and set up models
-      - name: Set up models
-        run: |
-          cd Fooocus
-          mkdir -p models/checkpoints
-          wget -P models/checkpoints/ <model_checkpoint_url>
-          mkdir -p models/vae_approx
-          wget -P models/vae_approx/ <vae_approx_url>
-          mkdir -p models/loras
-          wget -P models/loras/ <lora_model_url>
 
       # Step 6: Run Fooocus with remote port support
       - name: Run Fooocus
