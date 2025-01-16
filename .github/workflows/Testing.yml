@@ -18,4 +18,7 @@ jobs:
        cd /content
        sudo git clone https://github.com/lllyasviel/Fooocus.git
        cd /content/Fooocus
+       sudo python -m pip install --upgrade pip
+       sudo pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+       sudo pip install -r requirements.txt  # If additional dependencies are specified
        sudo python entry_with_update.py --share --always-high-vram
