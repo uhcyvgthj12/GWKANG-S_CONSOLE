@@ -4,32 +4,17 @@ name: Test
 
 on: 
   workflow_dispatch:
-    inputs:
-      tool:
-        description: 'Select Any Tool to Run'
-        type: choice
-        options:
-        - Windows
-        - FF_Ripper
-        - Blender
-        - Ripping_Tools
-        - Unity
-        - Daz_3d
-      code:
-        description: 'Enter Powershell code from crd website' 
-        required: true
-
-
+  
 jobs:
   build:
-    name: Setting up ${{ inputs.tool }}
-    runs-on: windows-latest
-    timeout-minutes: 360
+    name: Setting up 
+    runs-on: ubuntu-latest
 
     steps:
     - name: Copying Files
-      uses: actions/checkout@v4
-    - name: Setting Up ${{ inputs.tool }}
-      run:  ./installer.bat ${{ inputs.tool }} ${{ secrets.PASSWORD }} ${{ inputs.code }}
-    - name: keep alive
-      run: ls && ./counter.bat -Wait
+      run: |
+       pip install pygit2==1.15.1
+       cd /content
+       git clone https://github.com/lllyasviel/Fooocus.git
+       cd /content/Fooocus
+       python entry_with_update.py --share --always-high-vram
