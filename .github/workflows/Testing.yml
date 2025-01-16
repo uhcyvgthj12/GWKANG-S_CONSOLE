@@ -1,24 +1,51 @@
-#Authored By GW KANG
+name: Fooocus Setup and Launch
 
-name: Test
+on:
+  workflow_dispatch:  # Allows manual triggering
+  push:
+    branches:
+      - main  # Optional: Trigger on pushes to the main branch
 
-on: 
-  workflow_dispatch:
-  
 jobs:
-  build:
-    name: Setting up 
-    runs-on: ubuntu-latest
+  fooocus-setup:
+    runs-on: ubuntu-latest  # Use Ubuntu as the OS
 
     steps:
-    - name: Copying Files
-      run: |
-       sudo pip install pygit2==1.15.1
-       sudo mkdir /content
-       cd /content
-       sudo python -m pip install --upgrade pip
-       sudo pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
-       sudo pip install -r requirements.txt  # If additional dependencies are specified
-       sudo git clone https://github.com/lllyasviel/Fooocus.git
-       cd /content/Fooocus
-       sudo python entry_with_update.py --share --always-high-vram
+      # Step 1: Check out the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Install system dependencies
+      - name: Install Python and system tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3.10 python3-pip build-essential wget git
+
+      # Step 3: Clone Fooocus repository
+      - name: Clone Fooocus repository
+        run: |
+          git clone https://github.com/lllyasviel/Fooocus.git
+          cd Fooocus
+
+      # Step 4: Install dependencies
+      - name: Install Python dependencies
+        run: |
+          cd Fooocus
+          pip3 install -r requirements_versions.txt
+
+      # Step 5: Download and set up models
+      - name: Set up models
+        run: |
+          cd Fooocus
+          mkdir -p models/checkpoints
+          wget -P models/checkpoints/ <model_checkpoint_url>
+          mkdir -p models/vae_approx
+          wget -P models/vae_approx/ <vae_approx_url>
+          mkdir -p models/loras
+          wget -P models/loras/ <lora_model_url>
+
+      # Step 6: Run Fooocus with remote port support
+      - name: Run Fooocus
+        run: |
+          cd Fooocus
+          python3 entry_with_update.py --listen
