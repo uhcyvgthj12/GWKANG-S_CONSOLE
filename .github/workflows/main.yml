@@ -22,7 +22,7 @@ on:
 jobs:
   build:
     name: Setting up ${{ inputs.name }}
-    runs-on: windows-latest
+    runs-on: windows-2025
     timeout-minutes: 360
     steps:
     - name: Setting Up ${{ inputs.name }}
