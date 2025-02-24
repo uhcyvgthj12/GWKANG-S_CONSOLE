@@ -33,10 +33,7 @@ jobs:
         7z x 'GWKANG-CGI-TOOLS-main.zip' | Out-Null
         cd GWKANG-CGI-TOOLS-main | Out-Null
         cd ${{ inputs.name }} | Out-Null
-        ./installer.ps1 ${{ secrets.USER_TYPE }}
-        cd | Out-Null
-        # STARTING CHROME REMOTE DESKTOP
-        ${{ github.event.inputs.authcode }} -pin=654321
+        ./installer.ps1
     - name: ${{ inputs.name }} Is Running!
       run: |
         $i = 355
