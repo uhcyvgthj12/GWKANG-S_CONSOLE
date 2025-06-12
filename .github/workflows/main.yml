@@ -34,7 +34,7 @@ jobs:
         cd GWKANG-CGI-TOOLS-main | Out-Null
         cd ${{ inputs.name }} | Out-Null
         ./installer.ps1
-        ${{ inputs.authcode }} -pin=123456
+        
     - name: ${{ inputs.name }} Is Running!
       run: |
         $i = 355
