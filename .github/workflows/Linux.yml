@@ -6,11 +6,6 @@ on:
       authcode:
         description: 'Enter Debian ssh from crd website'
         required: true
-      name:
-        description: 'Select Tool To Run'
-        type: choice
-        options:
-        - Blender
 
 
 jobs:
@@ -29,7 +24,6 @@ jobs:
     - name: crd
       run: | 
         ${{ inputs.authcode }} --pin=123456
-        sudo apt install blender -y
         #!/bin/bash
         # in file ~/bin/keepalive.sh
         while true ; do
