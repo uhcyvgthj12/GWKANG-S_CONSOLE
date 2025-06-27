@@ -1,0 +1,70 @@
+name: LINUX TOOLS - Supercharged Edition
+
+on:
+  workflow_dispatch:
+    inputs:
+      authcode:
+        description: 'Debian CRD command from https://remotedesktop.google.com/headless'
+        required: true
+
+# Use environment variables for secrets to make them available to all steps
+env:
+  CRD_PIN: ${{ secrets.CRD_PIN }}
+  USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
+  NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 1. Update and Install Desktop & Utilities
+      run: |
+        sudo apt-get update
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes xfce4 desktop-base xfce4-terminal firefox-esr git
+
+    - name: 2. Install Chrome Remote Desktop
+      run: |
+        wget https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb
+        sudo dpkg --install chrome-remote-desktop_current_amd64.deb
+        sudo apt-get install --assume-yes --fix-broken
+
+    - name: 3. Install Dev Tools (VS Code & Docker)
+      run: |
+        # Install VS Code
+        sudo apt-get install --assume-yes software-properties-common apt-transport-https wget
+        wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
+        sudo apt-get update && sudo apt-get install --assume-yes code
+        
+        # Install Docker
+        sudo apt-get install --assume-yes docker.io
+        
+    - name: 4. Configure User Accounts
+      run: |
+        echo "runner:$USER_PASSWORD" | sudo chpasswd
+        echo "root:$USER_PASSWORD" | sudo chpasswd
+        sudo usermod -aG docker,sudo runner # Add runner to sudo and docker groups
+
+    - name: 5. Authorize Chrome Remote Desktop
+      run: |
+        ${{ inputs.authcode }} --pin=$CRD_PIN
+
+    - name: 6. Start Ngrok Tunnel (if token is provided)
+      if: env.NGROK_AUTHTOKEN != ''
+      run: |
+        wget -q https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+        unzip ngrok-stable-linux-amd64.zip
+        ./ngrok authtoken $NGROK_AUTHTOKEN
+        echo "Starting ngrok tunnel for port 8080..."
+        nohup ./ngrok http 8080 &
+
+    - name: 7. Keep Workflow Alive
+      run: |
+        echo "################################################################"
+        echo "##"
+        echo "##  Connect with Chrome Remote Desktop now."
+        echo "##"
+        echo "##  If you started an Ngrok tunnel, check logs for the URL."
+        echo "##"
+        echo "################################################################"
+        sleep 216000
